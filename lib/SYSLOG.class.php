@@ -313,9 +313,9 @@ class SYSLOG
 
         $this->module = $module;
         $this->transid = 0;
-        //$this->DB->Execute('INSERT INTO logtransactions (time, userid, module)
-        //  VALUES(?NOW?, ?, ?)', array($this->userid, $this->module));
-        //$this->transid = $this->DB->GetLastInsertID('logtransactions');
+        $this->DB->Execute('INSERT INTO logtransactions (time, userid, module)
+          VALUES(?NOW?, ?, ?)', array($this->userid, $this->module));
+        $this->transid = $this->DB->GetLastInsertID('logtransactions');
     }
 
     public function AddMessage($resource, $operation, $data = null, $keys = null)

@@ -44,6 +44,7 @@
                 {$nodestats.disconnected}
             </td>
         </tr>
+        {if !ConfigHelper::checkConfig('phpui.lms4lan')}
         <tr>
             <td class="text-right bold">
                 <a href="?m=nodelist&amp;s=5">{trans("TERRIT not specified")}:</a>
@@ -52,6 +53,7 @@
                 {$nodestats.withoutterryt}
             </td>
         </tr>
+        {/if}
         <tr>
             <td class="text-right bold">
                 <a href="?m=nodelist&amp;s=6">{trans("Net Device not specified")}:</a>

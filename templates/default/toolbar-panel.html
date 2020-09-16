@@ -8,11 +8,13 @@
 
 		<div class="lms-ui-toolbar-shortcut-separator"></div>
 
+		{if !ConfigHelper::checkConfig('phpui.lms4lan')}
 		<div class="lms-ui-toolbar-shortcut">
 			<a href="?m=messageadd" {tip text="Allows you to send messages to customers"}><img src="img/mail_add.png" width="20" alt=""></a>
 			<a href="?m=rtqueuelist" {tip text="Requests Tracking"}><img src="img/ticket.gif" width="20" alt=""></a>
 			<a href="?m=documentadd" {tip text="Allows you to add new document"}><img src="img/docum.gif" width="20" alt=""></a>
 		</div>
+		{/if}
 
 		<div class="lms-ui-toolbar-shortcut-separator"></div>
 
@@ -32,6 +34,7 @@
 
 		<div class="lms-ui-toolbar-shortcut-separator"></div>
 
+		{if !ConfigHelper::checkConfig('phpui.lms4lan')}
 		<div class="lms-ui-toolbar-shortcut">
 			<a href="?m=eventlist" {tip text="Timetable"}><img src="img/calendar.png" width="20" alt=""></a>
 			<a href="?m=eventadd" {tip text="New Event Addition"}><img src="img/calendar_add.png" width="20" alt=""></a>
@@ -45,6 +48,7 @@
 			<a href="?m=receiptadd" {tip text="Generate cash receipt"}><img src="img/pay.gif" width="20" alt=""></a>
 			<a href="?m=invoicenew" {tip text="Generate invoice"}><img src="img/money.gif" width="20" alt=""></a>
 		</div>
+		{/if}
 
 		<div class="lms-ui-toolbar-shortcut-separator"></div>
 
