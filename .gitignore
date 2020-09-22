@@ -22,6 +22,7 @@ rtattachments/*
 *~
 *.swp
 *.swo
+*.log
 
 # nodejs files
 **/node_modules
@@ -29,3 +30,5 @@ rtattachments/*
 
 /components/*
 /vendor/
+
+/vagrant/.vagrant/*
