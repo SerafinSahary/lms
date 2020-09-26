@@ -791,6 +791,9 @@ class LMSCustomerManager extends LMSManager implements LMSCustomerManagerInterfa
                         JOIN addresses a ON a.id = ca.address_id
                         WHERE a.zip IS NULL)';
                     break;
+                case 75:
+                    $state_conditions[] = 'c.id IN (SELECT DISTINCT customerid FROM assignments WHERE commited = 1 AND (vdiscount > 0 OR pdiscount > 0))';
+                    break;
                 default:
                     if ($state_item > 0 && $state_item < 50 && intval($state_item)) {
                         $customer_statuses[] = intval($state_item);
@@ -799,7 +802,7 @@ class LMSCustomerManager extends LMSManager implements LMSCustomerManagerInterfa
             }
         }
         if (!empty($customer_statuses)) {
-            $state_conditions[] = '(c.status = ' . implode(' AND c.status = ', $customer_statuses) . ' AND c.deleted = 0)';
+            $state_conditions[] = '((c.status = ' . implode(' ' . $statesqlskey . ' c.status = ', $customer_statuses) . ') AND c.deleted = 0)';
         }
 
         if (isset($assignments)) {
@@ -1394,10 +1397,15 @@ class LMSCustomerManager extends LMSManager implements LMSCustomerManagerInterfa
     public function GetCustomerNetworks($id, $count = null)
     {
         return $this->db->GetAll('
-            SELECT *
-            FROM vnetworks
-            WHERE ownerid = ?
-            ORDER BY name ASC
+            SELECT n.*,
+            nd.id AS routernetdevid, nd.name AS routernetdevname,
+            rn.nodeid AS routernodeid, nodes.name AS routernodename, INET_NTOA(nodes.ipaddr) AS routerip
+            FROM vnetworks n
+            LEFT JOIN routednetworks rn ON rn.netid = n.id
+            LEFT JOIN nodes ON nodes.id = rn.nodeid
+            LEFT JOIN netdevices nd ON nd.id = nodes.netdev AND nodes.ownerid IS NULL AND nodes.netdev IS NOT NULL
+            WHERE n.ownerid = ?
+            ORDER BY n.name ASC
             ' . ($count ? ' LIMIT ' . $count : ''), array($id));
     }
 
@@ -2025,7 +2033,7 @@ class LMSCustomerManager extends LMSManager implements LMSCustomerManagerInterfa
 
     public function isTerritAddress($address_id)
     {
-        return $this->db->GetOne('SELECT id FROM addresses WHERE city_id IS NOT NULL AND street_id IS NOT NULL') > 0;
+        return $this->db->GetOne('SELECT id FROM addresses WHERE city_id IS NOT NULL AND house IS NOT NULL AND id = ?', array($address_id)) > 0;
     }
 
     public function GetCustomerContacts($id, $mask = null)
@@ -2075,7 +2083,22 @@ class LMSCustomerManager extends LMSManager implements LMSCustomerManagerInterfa
             'SELECT c.id FROM customers c
             WHERE c.id = ? AND c.type = ?',
             array($customerid, CTYPES_COMPANY)
-        ) && $value >= $split_payment_threshold_value;
+        ) > 0 && $value >= $split_payment_threshold_value;
+    }
+
+    public function isTelecomServiceSuggested($customerid)
+    {
+        if (empty($customerid)) {
+            return false;
+        }
+
+        $customerid = intval($customerid);
+
+        return $this->db->GetOne(
+            'SELECT c.id FROM customers c
+            WHERE c.id = ? AND c.type = ?',
+            array($customerid, CTYPES_PRIVATE)
+        ) > 0;
     }
 
     public function getCustomerSMSOptions()
@@ -2096,6 +2119,7 @@ class LMSCustomerManager extends LMSManager implements LMSCustomerManagerInterfa
             'fast' => 'sms-customers.fast',
             'from' => 'sms-customers.from',
             'phone_number_validation_pattern' => 'sms-customers.phone_number_validation_pattern',
+            'message_template' => 'sms-customers.message_template',
         );
 
         foreach ($variable_mapping as $option_name => $variable_name) {

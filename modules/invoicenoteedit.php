@@ -165,6 +165,14 @@ switch ($action) {
             $cnote['splitpayment'] = 0;
         }
 
+        if (!isset($cnote['flags'][DOC_FLAG_RECEIPT])) {
+            $cnote['flags'][DOC_FLAG_RECEIPT] = 0;
+        }
+
+        if (!isset($cnote['flags'][DOC_FLAG_TELECOM_SERVICE])) {
+            $cnote['flags'][DOC_FLAG_TELECOM_SERVICE] = 0;
+        }
+
         $cnote['oldcdate'] = $oldcdate;
         $cnote['oldsdate'] = $oldsdate;
         $cnote['oldnumber'] = $oldnumber;
@@ -549,6 +557,8 @@ switch ($action) {
             'paytime' => $paytime,
             'paytype' => $cnote['paytype'],
             'splitpayment' => $cnote['splitpayment'],
+            'flags' => (empty($cnote['flags'][DOC_FLAG_RECEIPT]) ? 0 : DOC_FLAG_RECEIPT)
+                 + (empty($cnote['flags'][DOC_FLAG_TELECOM_SERVICE]) ? 0 : DOC_FLAG_TELECOM_SERVICE),
             SYSLOG::RES_CUST => $cnote['customerid'],
             'name' => $use_current_customer_data ? $customer['customername'] : $cnote['name'],
             'address' => $use_current_customer_data ? (($customer['postoffice'] && $customer['postoffice'] != $customer['city'] && $customer['street']
@@ -594,7 +604,7 @@ switch ($action) {
         $args[SYSLOG::RES_NUMPLAN] = !empty($cnote['numberplanid']) ? $cnote['numberplanid'] : null;
         $args[SYSLOG::RES_DOC] = $iid;
 
-        $DB->Execute('UPDATE documents SET cdate = ?, sdate = ?, paytime = ?, paytype = ?, splitpayment = ?, customerid = ?,
+        $DB->Execute('UPDATE documents SET cdate = ?, sdate = ?, paytime = ?, paytype = ?, splitpayment = ?, flags = ?, customerid = ?,
 				name = ?, address = ?, ten = ?, ssn = ?, zip = ?, city = ?, countryid = ?, reason = ?, divisionid = ?,
 				div_name = ?, div_shortname = ?, div_address = ?, div_city = ?, div_zip = ?, div_countryid = ?,
 				div_ten = ?, div_regon = ?, div_bank = ?, div_account = ?, div_inv_header = ?, div_inv_footer = ?,
@@ -741,10 +751,13 @@ if (!empty($contents)) {
     }
 }
 
-$SMARTY->assign('is_split_payment_suggested', $LMS->isSplitPaymentSuggested(
-    $cnote['customerid'],
-    date('Y/m/d', $cnote['cdate']),
-    $total_value
+$SMARTY->assign('suggested_flags', array(
+    'splitpayment' => $LMS->isSplitPaymentSuggested(
+        $cnote['customerid'],
+        date('Y/m/d', $cnote['cdate']),
+        $total_value
+    ),
+    'telecomservice' => true,
 ));
 
 $SMARTY->display('invoice/invoicenotemodify.html');

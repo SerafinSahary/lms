@@ -76,7 +76,7 @@ body {
 		}
 	}
 
-	&:not(.lms-ui-popup) {
+	&:not(.lms-ui-popup):not(.lms-ui-login-form) {
 		@media screen and (max-width: @mobile-max-width) {
 			margin-top: 4em;
 		}
@@ -1808,16 +1808,6 @@ table.dataTable {
 	}
 }
 
-.lms-ui-address-select.alert,
-.lms-ui-address-select {
-	.lms-ui-error {
-		background-color: @error-background !important;
-	}
-	.lms-ui-warning {
-		background-color: @warning-background !important;
-	}
-}
-
 .lms-ui-address-select {
 	padding-left: 4px;
 	padding-right: 4px;
@@ -1834,6 +1824,16 @@ table.dataTable {
 
 	& .ui-selectmenu-icon.ui-icon {
 		background: url('@{lms-img-path}/1.png') !important;
+	}
+
+	&.alert,
+	&.lms-ui-error {
+		background-color: @error-background !important;
+		color: @error-text !important;
+	}
+	&.lms-ui-warning {
+		background-color: @warning-background !important;
+		color: @warning-text !important;
 	}
 }
 
@@ -2303,7 +2303,7 @@ div.lms-ui-tab-container {
 			border-top: @frame;
 			background-color: @dark;
 			> :nth-child(n+2) {
-				margin-left: 0.2em;
+				margin-left: 0.5em;
 			}
 
 			.lms-ui-tab-buttons {
@@ -2314,7 +2314,7 @@ div.lms-ui-tab-container {
 				flex-wrap: wrap;
 
 				> :nth-child(n+2) {
-					margin-left: 0.2em;
+					margin-left: 0.5em;
 				}
 			}
 		}
@@ -2348,7 +2348,7 @@ div.lms-ui-tab-container {
 			background-color: @dark;
 			border-top: @frame;
 			> :nth-child(n+2) {
-				margin-left: 0.2em;
+				margin-left: 0.5em;
 			}
 		}
 		&:not(.header):not(.footer):not(:last-child) {

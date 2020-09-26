@@ -193,6 +193,8 @@ $prefer_settlement_only = ConfigHelper::checkConfig('payments.prefer_settlement_
 $prefer_netto = ConfigHelper::checkConfig('payments.prefer_netto');
 $customergroups = ConfigHelper::getConfig('payments.customergroups', '', true);
 
+$force_telecom_service_flag = ConfigHelper::checkValue(ConfigHelper::getConfig('invoices.force_telecom_service_flag', 'true'));
+
 function localtime2()
 {
     global $fakedate;
@@ -450,13 +452,13 @@ if (!empty($assigns)) {
 // let's go, fetch *ALL* assignments in given day
 $query = "SELECT a.id, a.tariffid, a.liabilityid, a.customerid, a.recipient_address_id,
 		a.period, a.backwardperiod, a.at, a.suspended, a.settlement, a.datefrom, a.dateto, a.pdiscount, a.vdiscount,
-		a.invoice, a.separatedocument,
+		a.invoice, a.separatedocument, c.type AS customertype,
 		(CASE WHEN c.type = ? THEN 0 ELSE (CASE WHEN a.liabilityid IS NULL THEN t.splitpayment ELSE l.splitpayment END) END) AS splitpayment,
 		(CASE WHEN a.liabilityid IS NULL THEN t.taxcategory ELSE l.taxcategory END) AS taxcategory,
 		t.description AS description, a.id AS assignmentid,
 		c.divisionid, c.paytype, a.paytype AS a_paytype, a.numberplanid, a.attribute,
 		d.inv_paytype AS d_paytype, t.period AS t_period, t.numberplanid AS tariffnumberplanid,
-		(CASE WHEN a.liabilityid IS NULL THEN t.type ELSE -1 END) AS tarifftype,
+		(CASE WHEN a.liabilityid IS NULL THEN t.type ELSE l.type END) AS tarifftype,
 		(CASE WHEN a.liabilityid IS NULL THEN t.name ELSE l.name END) AS name,
 		(CASE WHEN a.liabilityid IS NULL THEN t.taxid ELSE l.taxid END) AS taxid,
 		(CASE WHEN a.liabilityid IS NULL THEN t.prodid ELSE l.prodid END) AS prodid,
@@ -501,13 +503,14 @@ $billing_invoice_description = ConfigHelper::getConfig('payments.billing_invoice
 
 $query = "SELECT
 			a.id, a.tariffid, a.customerid, a.period, a.backwardperiod, a.at, a.suspended, a.settlement, a.datefrom,
-			0 AS pdiscount, 0 AS vdiscount, a.invoice, a.separatedocument,
+			0 AS pdiscount, 0 AS vdiscount, a.invoice, a.separatedocument, c.type AS customertype,
+			(CASE WHEN a.liabilityid IS NULL THEN t.type ELSE l.type END) AS tarifftype,
 			(CASE WHEN c.type = ? THEN 0 ELSE t.splitpayment END) AS splitpayment,
 			t.taxcategory AS taxcategory,
 			t.description AS description, a.id AS assignmentid,
 			c.divisionid, c.paytype, a.paytype AS a_paytype, a.numberplanid, a.attribute,
 			d.inv_paytype AS d_paytype, t.period AS t_period, t.numberplanid AS tariffnumberplanid,
-			t.type AS tarifftype, t.taxid AS taxid, '' as prodid, voipcost.value, t.currency, voipphones.phones,
+			t.taxid AS taxid, '' as prodid, voipcost.value, t.currency, voipphones.phones,
 			'set' AS liabilityid, '$billing_invoice_description' AS name,
 			? AS count,
 			(SELECT COUNT(id)
@@ -552,6 +555,7 @@ $query = "SELECT
 				GROUP BY vna2.assignment_id
 			) voipphones ON voipphones.assignment_id = a.id
 			LEFT JOIN tariffs t ON (a.tariffid = t.id)
+			LEFT JOIN liabilities l ON (a.liabilityid = l.id)
 			LEFT JOIN divisions d ON (d.id = c.divisionid)
 	    WHERE " . ($customerid ? 'c.id = ' . $customerid . ' AND ' : '') . "
 	      (c.status  = ? OR c.status = ?) AND
@@ -884,6 +888,7 @@ $numbers = array();
 $customernumbers = array();
 $numbertemplates = array();
 $invoices = array();
+$telecom_services = array();
 $currencies = array();
 $doctypes = array();
 $paytypes = array();
@@ -1081,6 +1086,8 @@ foreach ($assigns as $assign) {
 
         $val = str_replace(',', '.', sprintf("%.2f", $val));
 
+        $telecom_service = $force_telecom_service_flag && $assign['customertype'] == CTYPES_PRIVATE && $assign['tarifftype'] != SERVICE_OTHER;
+
         if ($assign['invoice']) {
             if ($assign['a_paytype']) {
                 $inv_paytype = $assign['a_paytype'];
@@ -1179,8 +1186,8 @@ foreach ($assigns as $assign) {
 					customerid, name, address, zip, city, ten, ssn, cdate, sdate, paytime, paytype,
 					div_name, div_shortname, div_address, div_city, div_zip, div_countryid, div_ten, div_regon,
 					div_bank, div_account, div_inv_header, div_inv_footer, div_inv_author, div_inv_cplace, fullnumber,
-					recipient_address_id, currency, currencyvalue, memo)
-					VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+					recipient_address_id, currency, currencyvalue, memo, flags)
+					VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     array(
                         $newnumber,
                         $plan ? $plan : null,
@@ -1212,10 +1219,14 @@ foreach ($assigns as $assign) {
                         $currency,
                         $currencyvalues[$currency],
                         empty($customer['documentmemo']) ? null : $customer['documentmemo'],
+                        $telecom_service ? DOC_FLAG_TELECOM_SERVICE : 0,
                     )
                 );
 
                 $invoices[$cid] = $DB->GetLastInsertID("documents");
+                if (!empty($telecom_service)) {
+                    $telecom_services[$invoices[$cid]] = $telecom_service;
+                }
                 $currencies[$cid] = $currency;
                 $doctypes[$cid] = $assign['invoice'];
                 $LMS->UpdateDocumentPostAddress($invoices[$cid], $cid);
@@ -1299,6 +1310,14 @@ foreach ($assigns as $assign) {
                                 $assign['vdiscount']
                             )
                         );
+
+                        if ($telecom_service && !isset($telecom_services[$invoices[$cid]])) {
+                            $DB->Execute(
+                                "UPDATE documents SET flags = ? WHERE id = ?",
+                                array(DOC_FLAG_TELECOM_SERVICE, $invoices[$cid])
+                            );
+                            $telecom_services[$invoices[$cid]] = true;
+                        }
                     }
                     if ($assign['invoice'] == DOC_INVOICE || $assign['invoice'] == DOC_DNOTE || $proforma_generates_commitment) {
                         $DB->Execute(
@@ -1462,6 +1481,14 @@ foreach ($assigns as $assign) {
                                     $assign['vdiscount']
                                 )
                             );
+
+                            if ($telecom_service && !isset($telecom_services[$invoices[$cid]])) {
+                                $DB->Execute(
+                                    "UPDATE documents SET flags = ? WHERE id = ?",
+                                    array(DOC_FLAG_TELECOM_SERVICE, $invoices[$cid])
+                                );
+                                $telecom_services[$invoices[$cid]] = true;
+                            }
                         }
                         if ($assign['invoice'] == DOC_INVOICE || $assign['invoice'] == DOC_DNOTE || $proforma_generates_commitment) {
                             $DB->Execute(
