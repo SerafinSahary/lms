@@ -253,6 +253,7 @@
 							<A id="randomize" href="javascript:randomize()" {tip text="Generate PIN"}>&raquo;&raquo;&raquo;</A>
 						</TD>
 					</TR>
+					{if !ConfigHelper::checkConfig('phpui.lms4lan')}
 					<TR>
 						<TD class="valign-top">
 							<i class="lms-ui-icon-user-id-number"></i>
@@ -405,6 +406,7 @@
 							</TABLE>
 						</TD>
 					</TR>
+					{/if}
 					{/block}
 				</TABLE>
 			</div>
@@ -439,6 +441,7 @@
 							<TEXTAREA name="customerdata[notes]" class="lms-ui-wysiwyg-editor" COLS="60" ROWS="10" {tip text="Enter notes (optional)"}{if isset($customerinfo.wysiwyg.notes)} data-wysiwyg="{$customerinfo.wysiwyg.notes}"{/if}>{$customerinfo.notes|escape}</TEXTAREA>
 						</TD>
 					</TR>
+					{if !ConfigHelper::checkConfig('phpui.lms4lan')}
 					<TR>
 						<TD>
 							<i class="lms-ui-icon-memo"></i>
@@ -458,6 +461,7 @@
 							{if $customerinfo.balance < 0}<span class="lms-ui-alert">{moneyf($customerinfo.balance)}</span>{else}{moneyf($customerinfo.balance)}{/if}
 						</TD>
 					</TR>
+					{/if}
 					<TR>
 						<TD>
 							<i class="lms-ui-icon-modified-date"></i>

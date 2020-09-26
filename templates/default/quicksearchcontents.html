@@ -23,7 +23,8 @@
 </div>
 {/if}
 
-{if ConfigHelper::checkPrivilege('customer_management') || ConfigHelper::checkPrivilege('voip_account_management') || ConfigHelper::checkPrivilege('read_only')}
+{if ( ConfigHelper::checkPrivilege('customer_management') || ConfigHelper::checkPrivilege('voip_account_management') || ConfigHelper::checkPrivilege('read_only') ) 
+	&& (!ConfigHelper::checkConfig('phpui.lms4lan')) }
 <div id="qs-phone" class="lms-ui-quick-search-field" data-mode="phone" data-label="{trans("<!qs>phone")}" data-keyboard-shortcut="{$qs_keyboard_shortcut_modifier}+2">
 	<i class="lms-ui-quick-search-icon lms-ui-icon-phone" {tip text="Enter phone number and press Enter"}></i>
     <input type="text" name="qs[phone]" value="" size="15" {tip text="Enter phone number and press Enter" class="blend lms-ui-quick-search-input"}>
@@ -89,7 +90,7 @@
 </div>
 {/if}
 
-{if ConfigHelper::checkPrivilege('helpdesk_operation') || ConfigHelper::checkPrivilege('read_only')}
+{if ( ConfigHelper::checkPrivilege('helpdesk_operation') || ConfigHelper::checkPrivilege('read_only')) && (!ConfigHelper::checkConfig('phpui.lms4lan')) }
 <div id="qs-ticket" class="lms-ui-quick-search-field" data-mode="ticket" data-label="{trans("<!qs>ticket")}" data-keyboard-shortcut="{$qs_keyboard_shortcut_modifier}+8">
 	<i class="lms-ui-quick-search-icon lms-ui-icon-helpdesk" {tip text="Enter request tracker ID, subject or requestor name and press Enter"}></i>
     <input type="text" name="qs[ticket]" value="" size="15" {tip text="Enter some property value and press Enter. Icon on left allows to choose which properties are considered." class="blend lms-ui-quick-search-input"}>
@@ -104,21 +105,21 @@
 </div>
 {/if}
 
-{if ConfigHelper::checkPrivilege('hosting_management') || ConfigHelper::checkPrivilege('read_only')}
+{if ( ConfigHelper::checkPrivilege('hosting_management') || ConfigHelper::checkPrivilege('read_only') ) && ( !ConfigHelper::checkConfig('phpui.lms4lan') ) }
 <div id="qs-account" class="lms-ui-quick-search-field" data-mode="account" data-label="{trans("<!qs>account")}" data-keyboard-shortcut="{$qs_keyboard_shortcut_modifier}+9">
 	<i class="lms-ui-quick-search-icon lms-ui-icon-hosting" {tip text="Enter account or alias name and press Enter"}></i>
     <input type="text" name="qs[account]" value="" size="15" {tip text="Enter account or alias name and press Enter" class="blend lms-ui-quick-search-input"}>
 </div>
 {/if}
 
-{if ConfigHelper::checkPrivilege('customer_management') || ConfigHelper::checkPrivilege('read_only')}
+{if ( ConfigHelper::checkPrivilege('customer_management') || ConfigHelper::checkPrivilege('read_only') ) && ( !ConfigHelper::checkConfig('phpui.lms4lan') ) }
 <div id="qs-docum" class="lms-ui-quick-search-field" data-mode="document" data-label="{trans("<!qs>document")}" data-keyboard-shortcut="{$qs_keyboard_shortcut_modifier}+y">
 	<i class="lms-ui-quick-search-icon lms-ui-icon-document" {tip text="Enter document number and press Enter"}></i>
     <input type="text" name="qs[document]" value="" size="15" {tip text="Enter document number and press Enter" class="blend lms-ui-quick-search-input"}>
 </div>
 {/if}
 
-{if ConfigHelper::checkPrivilege('customer_management') || ConfigHelper::checkPrivilege('read_only')}
+{if ( ConfigHelper::checkPrivilege('customer_management') || ConfigHelper::checkPrivilege('read_only') ) && ( !ConfigHelper::checkConfig('phpui.lms4lan') ) }
 <div id="qs-customerext" class="lms-ui-quick-search-field" data-mode="customerext" data-label="{trans("<!qs>customer external id")}" data-keyboard-shortcut="{$qs_keyboard_shortcut_modifier}+e">
 	<i class="lms-ui-quick-search-icon lms-ui-icon-externalid" {tip text="Enter external customer ID fragment and press Enter"}></i>
     <input type="text" name="qs[customerext]" value="" size="15" {tip text="Enter external customer ID fragment and press Enter" class="blend lms-ui-quick-search-input"}>

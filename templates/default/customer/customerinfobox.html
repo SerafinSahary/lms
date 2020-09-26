@@ -246,6 +246,7 @@
 								</TD>
 							</TR>
 						{/if}
+						{if !ConfigHelper::checkConfig('phpui.lms4lan')}
 							<TR>
 								<TD WIDTH="1%" style="vertical-align: top">
 									{icon name="paytype"}
@@ -320,6 +321,7 @@
 									</TABLE>
 								</TD>
 							</TR>
+						{/if}
 
 						{/block}
 						</TABLE>
@@ -391,7 +393,8 @@
 						</TD>
 					</TR>
 					{/if}
-					{if ConfigHelper::checkConfig('privileges.superuser') || !ConfigHelper::checkConfig('privileges.hide_finances')}
+					{if ( ConfigHelper::checkConfig('privileges.superuser') || !ConfigHelper::checkConfig('privileges.hide_finances') )
+						&& (!ConfigHelper::checkConfig('phpui.lms4lan')) }
 					<TR>
 						<TD WIDTH="1%">
 							{icon name="money"}
@@ -473,13 +476,15 @@
 				{/if}
 				{button id="restore-button" icon="restore" label="Restore" onclick="location.href = '?m=customeredit&id={$customerinfo.id}&action=recover';"}
 			{else}
-				{button type="link-button" id="rtsearch-button" class="{if $customerstats['tickets']['notresolved']}bold{/if}" icon="timetable"
-					label="{trans("Tickets")}{if $customerstats['tickets']} ({$customerstats['tickets']['all']}{if $customerstats['tickets']['notresolved']} / {$customerstats['tickets']['notresolved']}{/if}){/if}"
-					href="?m=rtsearch&id={$customerinfo.id}"}
-				{button type="link-button" id="accounts-button" icon="customer" label="{trans("Accounts")} ({$customerstats['accounts']})"
-					href="?m=accountlist&u={$customerinfo.id}"}
-				{button type="link-button" id="domains-button" icon="network"
-					label="{trans("Domains")} ({$customerstats['domains']})" href="?m=domainlist&c={$customerinfo.id}"}
+				{if !ConfigHelper::checkConfig('phpui.lms4lan')}
+					{button type="link-button" id="rtsearch-button" class="{if $customerstats['tickets']['notresolved']}bold{/if}" icon="timetable"
+						label="{trans("Tickets")}{if $customerstats['tickets']} ({$customerstats['tickets']['all']}{if $customerstats['tickets']['notresolved']} / {$customerstats['tickets']['notresolved']}{/if}){/if}"
+						href="?m=rtsearch&id={$customerinfo.id}"}
+					{button type="link-button" id="accounts-button" icon="customer" label="{trans("Accounts")} ({$customerstats['accounts']})"
+						href="?m=accountlist&u={$customerinfo.id}"}
+					{button type="link-button" id="domains-button" icon="network"
+						label="{trans("Domains")} ({$customerstats['domains']})" href="?m=domainlist&c={$customerinfo.id}"}
+				{/if}
 				{button type="link-button" id="stats-button" icon="stats" label="Stats"
 					href="?m=trafficprint&type=customertraffic&customer={$customerinfo.id}"}
 				{button type="link-button" id="edit-button" icon="edit" label="Edit" href="?m=customeredit&id={$customerinfo.id}"}

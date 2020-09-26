@@ -293,8 +293,11 @@ $CUSTOMERCONTACTTYPES = array(
         'flagmask' => CONTACT_EMAIL,
         'formatter' => 'format_customer_email',
         'validator' => 'validate_customer_emails',
-    ),
-    'account' => array(
+    )
+);
+
+if (!ConfigHelper::checkConfig('phpui.lms4lan')) {    
+    $CUSTOMERCONTACTTYPES['account'] = array(
         'ui' => array(
             'legend' => array(
                 'icon' => 'lms-ui-icon-cash fa-fw',
@@ -317,8 +320,8 @@ $CUSTOMERCONTACTTYPES = array(
         'flagmask' => CONTACT_BANKACCOUNT,
         'formatter' => 'format_customer_account',
         'validator' => 'validate_customer_accounts',
-    ),
-    'url' => array(
+    );
+    $CUSTOMERCONTACTTYPES['url'] = array(
         'ui' => array(
             'legend' => array(
                 'icon' => 'lms-ui-icon-www fa-fw',
@@ -337,8 +340,8 @@ $CUSTOMERCONTACTTYPES = array(
         'flagmask' => CONTACT_URL,
         'formatter' => 'format_customer_url',
         'validator' => 'validate_customer_urls',
-    ),
-    'im' => array(
+    );
+    $CUSTOMERCONTACTTYPES['im'] = array(
         'ui' => array(
             'legend' => array(
                 'icon' => 'lms-ui-icon-chat fa-fw',
@@ -362,8 +365,8 @@ $CUSTOMERCONTACTTYPES = array(
         'flagmask' => CONTACT_IM_GG | CONTACT_IM_YAHOO | CONTACT_IM_SKYPE | CONTACT_IM_FACEBOOK,
         'formatter' => 'format_customer_im',
         'validator' => 'validate_customer_ims',
-    ),
-    'representative' => array(
+    );
+    $CUSTOMERCONTACTTYPES['representative'] = array(
         'ui' => array(
             'legend' => array(
                 'icon' => 'lms-ui-icon-user fa-fw',
@@ -382,8 +385,8 @@ $CUSTOMERCONTACTTYPES = array(
         'flagmask' => CONTACT_REPRESENTATIVE,
         'formatter' => 'format_customer_representative',
         'validator' => 'validate_customer_representatives',
-    ),
-);
+    );
+}
 
 global $SMARTY;
 

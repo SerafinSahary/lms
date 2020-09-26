@@ -284,6 +284,9 @@
 						<A href="javascript:randomize()" {tip text="Generate random PIN"}>&raquo;&raquo;&raquo;</A>
 					</TD>
 				</TR>
+
+				{if !ConfigHelper::checkConfig('phpui.lms4lan')}
+
 				<TR>
 					<TD class="valign-top">
 						<IMG src="img/serialnumber.gif" alt="">
@@ -436,6 +439,7 @@
 						</TABLE>
 					</TD>
 				</TR>
+				{/if}
 				{/block}
 			</TABLE>
 			</div>
@@ -464,6 +468,8 @@
 						<TEXTAREA rows="10" cols="60" name="customeradd[notes]" class="lms-ui-wysiwyg-editor" {tip text="Enter notes (optional)"}{if isset($customeradd.wysiwyg.notes)} data-wysiwyg="{$customeradd.wysiwyg.notes}"{/if}>{$customeradd.notes|escape}</TEXTAREA>
 					</TD>
 				</TR>
+				
+				{if !ConfigHelper::checkConfig('phpui.lms4lan')}
 				<TR>
 					<TD>
 						<i class="lms-ui-icon-memo"></i>
@@ -474,6 +480,7 @@
 								{if isset($customeradd.wysiwyg.documentmemo)} data-wysiwyg="{$customeradd.wysiwyg.documentmemo}"{/if}>{$customeradd.documentmemo|escape}</TEXTAREA>
 					</TD>
 				</TR>
+				{/if}
 				{/block}
 			</TABLE>
 			</div>
