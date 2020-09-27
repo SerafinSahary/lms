@@ -237,6 +237,7 @@
 									{/if}
 								{/if}
 
+								{if !ConfigHelper::checkConfig('phpui.lms4lan')}
 								<tr>
 									<td>
 										<img src="img/money.gif" alt="">
@@ -248,6 +249,7 @@
 										{$nodeinfo.projectname}
 									</td>
 								</tr>
+								{/if}
 
 								{if !$disable_active_links || ($nodeinfo.chkmac + $nodeinfo.halfduplex) != 0}
 								<tr>

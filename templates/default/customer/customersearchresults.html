@@ -36,8 +36,10 @@
 			{trans("Services:")}
 		</TD>
 		<TD width="1%" ALIGN="right" valign="top">
+			{if !ConfigHelper::checkConfig('phpui.lms4lan')}
 			{if ConfigHelper::checkConfig('privileges.superuser') || !ConfigHelper::checkConfig('privileges.hide_finances')}<a href="?m=customersearch&search=1&o=balance{if $listdata.direction == "asc" && $listdata.order == "balance"},desc{/if}">{trans("Balance:")}</A>&nbsp;{if $listdata.order == "balance"}<IMG SRC="img/{if $listdata.direction == "desc"}asc{else}desc{/if}_order.gif" alt="">{/if}<BR>
 			<a href="?m=customersearch&search=1&o=tariff{if $listdata.direction == "asc" && $listdata.order == "tariff"},desc{/if}">{trans("Subscription:")}</A>&nbsp;{if $listdata.order == "tariff"}<IMG SRC="img/{if $listdata.direction == "desc"}asc{else}desc{/if}_order.gif" alt="">{/if}{/if}
+			{/if}
 		</TD>
 		<TD width="1%" align="right" nowrap>
 			<B>{t a=$listdata.total|default:"0"}Total: $a{/t}</B>&nbsp;
@@ -70,8 +72,10 @@
 			{/if}
 		</TD>
 		<TD class="text-right valign-top nobr">
+			{if !ConfigHelper::checkConfig('phpui.lms4lan')}
 			{if ConfigHelper::checkConfig('privileges.superuser') || !ConfigHelper::checkConfig('privileges.hide_finances')}
 			<IMG src="img/empty.gif" width="1" height="16" ALT="">{if $customerlist[customerlist].balance < 0}<font class="alert">{/if}{$customerlist[customerlist].balance|money_format}{if $customerlist[customerlist].balance < 0}</span>{/if}<BR><IMG src="img/empty.gif" width="1" height="16" ALT=""><span CLASS="blend">{$customerlist[customerlist].tariffvalue|money_format}</span>
+			{/if}
 			{/if}
 		</TD>
 		<TD class="text-right nobr">
@@ -193,15 +197,19 @@
 			&nbsp;
 		</TD>
 		<TD align="right">
+			{if !ConfigHelper::checkConfig('phpui.lms4lan')}
 			{if ConfigHelper::checkConfig('privileges.superuser') || (!ConfigHelper::checkConfig('privileges.hide_finances') && !ConfigHelper::checkConfig('privileges.hide_summaries'))}
 			<B>{trans("Outstandings")}:<BR>
 			{trans("Overcharges")}:</B>
 			{/if}
+			{/if}
 		</TD>
 		<TD align="right" nowrap>
+			{if !ConfigHelper::checkConfig('phpui.lms4lan')}
 			{if ConfigHelper::checkConfig('privileges.superuser') || (!ConfigHelper::checkConfig('privileges.hide_finances') && !ConfigHelper::checkConfig('privileges.hide_summaries'))}
 			<B>{$listdata.below|money_format}<BR>
 			{$listdata.over|money_format}</B>
+			{/if}
 			{/if}
 		</TD>
 		<TD align="right" valign="top" nowrap>

@@ -144,31 +144,33 @@ if (!isset($_POST['xjxfun'])) {
             }
 
             // check addresses
-            foreach ($customerdata['addresses'] as $k => $v) {
-                if ($v['location_address_type'] == BILLING_ADDRESS && !$v['location_city_name']) {
-                    $error['customerdata[addresses][' . $k . '][location_city_name]'] = trans('City name required!');
-                    $customerdata['addresses'][ $k ]['show'] = true;
-                }
-
-                $countryCode = null;
-                if (!empty($v['location_country_id'])) {
-                    $countryCode = $LMS->getCountryCodeById($v['location_country_id']);
-                    if ($v['location_address_type'] == BILLING_ADDRESS) {
-                        $billingCountryCode = $countryCode;
+            if (!ConfigHelper::checkConfig('phpui.lms4lan')) {
+                foreach ($customerdata['addresses'] as $k => $v) {
+                    if ($v['location_address_type'] == BILLING_ADDRESS && !$v['location_city_name']) {
+                        $error['customerdata[addresses][' . $k . '][location_city_name]'] = trans('City name required!');
+                        $customerdata['addresses'][ $k ]['show'] = true;
                     }
-                }
 
-                if (!ConfigHelper::checkPrivilege('full_access') && ConfigHelper::checkConfig('phpui.teryt_required')
-                    && !empty($v['location_city_name']) && ($v['location_country_id'] == 2 || empty($v['location_country_id']))
-                    && (!isset($v['teryt']) || empty($v['location_city'])) && $LMS->isTerritState($v['location_state_name'])) {
-                    $error['customerdata[addresses][' . $k . '][teryt]'] = trans('TERRIT address is required!');
-                    $customerdata['addresses'][ $k ]['show'] = true;
-                }
+                    $countryCode = null;
+                    if (!empty($v['location_country_id'])) {
+                        $countryCode = $LMS->getCountryCodeById($v['location_country_id']);
+                        if ($v['location_address_type'] == BILLING_ADDRESS) {
+                            $billingCountryCode = $countryCode;
+                        }
+                    }
 
-                Localisation::setSystemLanguage($countryCode);
-                if ($v['location_zip'] && !check_zip($v['location_zip'])) {
-                    $error['customerdata[addresses][' . $k . '][location_zip]'] = trans('Incorrect ZIP code!');
-                    $customerdata['addresses'][ $k ]['show'] = true;
+                    if (!ConfigHelper::checkPrivilege('full_access') && ConfigHelper::checkConfig('phpui.teryt_required')
+                        && !empty($v['location_city_name']) && ($v['location_country_id'] == 2 || empty($v['location_country_id']))
+                        && (!isset($v['teryt']) || empty($v['location_city'])) && $LMS->isTerritState($v['location_state_name'])) {
+                        $error['customerdata[addresses][' . $k . '][teryt]'] = trans('TERRIT address is required!');
+                        $customerdata['addresses'][ $k ]['show'] = true;
+                    }
+
+                    Localisation::setSystemLanguage($countryCode);
+                    if ($v['location_zip'] && !check_zip($v['location_zip'])) {
+                        $error['customerdata[addresses][' . $k . '][location_zip]'] = trans('Incorrect ZIP code!');
+                        $customerdata['addresses'][ $k ]['show'] = true;
+                    }
                 }
             }
 
@@ -236,13 +238,15 @@ if (!isset($_POST['xjxfun'])) {
                 }
             }
 
-            if ($customerdata['regon'] != '' && !check_regon($customerdata['regon'])) {
-                $error['regon'] = trans('Incorrect Business Registration Number!');
-            }
+            if (!ConfigHelper::checkConfig('phpui.lms4lan')) {
+                if ($customerdata['regon'] != '' && !check_regon($customerdata['regon'])) {
+                    $error['regon'] = trans('Incorrect Business Registration Number!');
+                }
 
-            if ($customerdata['icn'] != '' && !isset($customerdata['icnwarning']) && !check_icn($customerdata['icn'])) {
-                $warning['icn'] = trans('Incorrect Identity Card Number! If you are sure you want to accept, then click "Submit" again.');
-                $icnwarning = 1;
+                if ($customerdata['icn'] != '' && !isset($customerdata['icnwarning']) && !check_icn($customerdata['icn'])) {
+                    $warning['icn'] = trans('Incorrect Identity Card Number! If you are sure you want to accept, then click "Submit" again.');
+                    $icnwarning = 1;
+                }
             }
 
             Localisation::resetSystemLanguage();
@@ -276,29 +280,31 @@ if (!isset($_POST['xjxfun'])) {
                 }
             }
 
-            if (isset($customerdata['consents'][CCONSENT_INVOICENOTICE]) && !$emaileinvoice) {
-                if ($customer_invoice_notice_consent_check == 'error') {
-                    $error['chkconsent' . CCONSENT_INVOICENOTICE] =
-                        trans('If the customer wants to receive an electronic invoice must be checked e-mail address to which to send e-invoices');
-                } elseif ($customer_invoice_notice_consent_check == 'warning'
-                    && !isset($warnings['customerdata-consents--' . CCONSENT_INVOICENOTICE . '-'])) {
-                    $warning['customerdata[consents][' . CCONSENT_INVOICENOTICE . ']'] =
-                        trans('If the customer wants to receive an electronic invoice must be checked e-mail address to which to send e-invoices');
+            if (!ConfigHelper::checkConfig('phpui.lms4lan')) {
+                if (isset($customerdata['consents'][CCONSENT_INVOICENOTICE]) && !$emaileinvoice) {
+                    if ($customer_invoice_notice_consent_check == 'error') {
+                        $error['chkconsent' . CCONSENT_INVOICENOTICE] =
+                            trans('If the customer wants to receive an electronic invoice must be checked e-mail address to which to send e-invoices');
+                    } elseif ($customer_invoice_notice_consent_check == 'warning'
+                        && !isset($warnings['customerdata-consents--' . CCONSENT_INVOICENOTICE . '-'])) {
+                        $warning['customerdata[consents][' . CCONSENT_INVOICENOTICE . ']'] =
+                            trans('If the customer wants to receive an electronic invoice must be checked e-mail address to which to send e-invoices');
+                    }
                 }
-            }
 
-            if (isset($customerdata['cutoffstopindefinitely'])) {
-                $cutoffstop = intval(pow(2, 31) - 1);
-            } elseif ($customerdata['cutoffstop'] == '') {
-                $cutoffstop = 0;
-            } elseif ($cutoffstop = date_to_timestamp($customerdata['cutoffstop'])) {
-                $cutoffstop += 86399;
-            } else {
-                $error['cutoffstop'] = trans('Incorrect date of cutoff suspending!');
-            }
+                if (isset($customerdata['cutoffstopindefinitely'])) {
+                    $cutoffstop = intval(pow(2, 31) - 1);
+                } elseif ($customerdata['cutoffstop'] == '') {
+                    $cutoffstop = 0;
+                } elseif ($cutoffstop = date_to_timestamp($customerdata['cutoffstop'])) {
+                    $cutoffstop += 86399;
+                } else {
+                    $error['cutoffstop'] = trans('Incorrect date of cutoff suspending!');
+                }
 
-            if (!preg_match('/^[\-]?[0-9]+$/', $customerdata['paytime'])) {
-                $error['paytime'] = trans('Invalid deadline format!');
+                if (!preg_match('/^[\-]?[0-9]+$/', $customerdata['paytime'])) {
+                    $error['paytime'] = trans('Invalid deadline format!');
+                }
             }
 
             $hook_data = $LMS->executeHook(
