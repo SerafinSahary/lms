@@ -897,6 +897,7 @@ $NETELEMENTSTATUSES = array(
     0   => trans('existing'),
     1   => trans('under construction'),
     2   => trans('planned'),
+    3   => trans('decomissioned'),
 );
 
 $NETELEMENTTYPES = array(
