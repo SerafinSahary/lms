@@ -11,5 +11,5 @@ computers inventory (IP, MAC), simple financial system suited for network operat
 
 This is clone of LMS repository meant to develop LMS4LAN branch - an updated version of LMS dedicated for enterprise LAN management. The main reason for creating this fork was the need for webconsole for Radius database management. 
 There are two branches in the repo:
-- master - meant to track source LMS project
-- lms4lan - meant to develop updates for LAN management
+- master - meant for tracking source LMS project
+- lms4lan - meant for developing updates for LAN management
