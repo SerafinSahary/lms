@@ -11,5 +11,9 @@ computers inventory (IP, MAC), simple financial system suited for network operat
 
 This is clone of LMS repository meant to develop LMS4LAN branch - an updated version of LMS dedicated for enterprise LAN management. The main reason for creating this fork was the need for webconsole for Radius database management. 
 There are two branches in the repo:
-- master - meant for tracking source LMS project
-- lms4lan - meant for developing updates for LAN management
+- master - meant for tracking source LMS project,
+- lms4lan - meant for developing updates for LAN management.
+
+Additionally, within LMS4LAN branch there are two extras available:
+- [Vagrant](https://www.vagrantup.com/) configuration scripts for provisioning LMS development environment,
+- [FreeRADIUS](https://freeradius.org/) integration scripts for database views, to provide LMS data for RADIUS integration within FreeRADIUS table formats.
